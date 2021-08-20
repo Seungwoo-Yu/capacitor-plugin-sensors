@@ -1,9 +1,3 @@
-declare module "@capacitor/core" {
-  interface PluginRegistry {
-      _SensorsPlugin: SensorsPluginPlugin;
-  }
-}
-
 export declare const enum SensorType {
   PROXIMITY = "PROXIMITY",
   ACCELEROMETER = "ACCELEROMETER",
@@ -33,7 +27,13 @@ export declare const enum SensorType {
   LOW_LATENCY_OFFBODY_DETECT = "LOW_LATENCY_OFFBODY_DETECT",
   ACCELEROMETER_UNCALIBRATED = "ACCELEROMETER_UNCALIBRATED",
   ALL = "ALL",
-  UNKNOWN = "UNKNOWN"
+  UNKNOWN = "UNKNOWN",
+  ALL_THERMAL_ZONE = "ALL_THERMAL_ZONE",
+}
+
+export interface ThermalZone {
+  name: string,
+  value: number,
 }
 
 export interface Sensor {
@@ -42,8 +42,15 @@ export interface Sensor {
   type: SensorType
 }
 
-export interface SensorsPluginPlugin {
+export type SensorOrThermalZone = {
+  thermalZones: ThermalZone[] | undefined,
+  sensors: Sensor[] | undefined,
+}
+
+export interface SensorsPlugin {
+  get(options: {type: SensorType.ALL_THERMAL_ZONE}): Promise<{thermalZones: ThermalZone[]}>
   get(options: {type: SensorType}): Promise<{sensors: Sensor[]}>;
-  // start(options: Sensor): Promise<{values: number[]}>;
+  get(options: {type: SensorType}): Promise<SensorOrThermalZone>;
+  start(options: Sensor): Promise<{values: number[]}>;
   stop(options: Sensor): Promise<void>;
 }
